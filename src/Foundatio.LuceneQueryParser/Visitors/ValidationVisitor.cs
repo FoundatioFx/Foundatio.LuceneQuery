@@ -28,7 +28,7 @@ public class ValidationVisitor : QueryNodeVisitor
     /// <summary>
     /// Visits a FieldQueryNode and validates the field.
     /// </summary>
-    public override async Task<QueryNode> VisitAsync(FieldQueryNode node, IQueryVisitorContext context)
+    public override Task<QueryNode> VisitAsync(FieldQueryNode node, IQueryVisitorContext context)
     {
         var result = context.GetValidationResult();
 
@@ -41,7 +41,7 @@ public class ValidationVisitor : QueryNodeVisitor
         // Add operation
         result.AddOperation("field", node.Field);
 
-        return await base.VisitAsync(node, context).ConfigureAwait(false);
+        return base.VisitAsync(node, context);
     }
 
     /// <summary>
@@ -56,8 +56,8 @@ public class ValidationVisitor : QueryNodeVisitor
         result.AddOperation("term", null);
 
         // Check for leading wildcards
-        if (!options.AllowLeadingWildcards && 
-            !string.IsNullOrEmpty(node.Term) && 
+        if (!options.AllowLeadingWildcards &&
+            !string.IsNullOrEmpty(node.Term) &&
             (node.Term.StartsWith('*') || node.Term.StartsWith('?')))
         {
             context.AddValidationError($"Terms must not start with a wildcard: {node.Term}");
@@ -131,11 +131,11 @@ public class ValidationVisitor : QueryNodeVisitor
     /// <summary>
     /// Visits a NotNode.
     /// </summary>
-    public override async Task<QueryNode> VisitAsync(NotNode node, IQueryVisitorContext context)
+    public override Task<QueryNode> VisitAsync(NotNode node, IQueryVisitorContext context)
     {
         var result = context.GetValidationResult();
         result.AddOperation("not", null);
-        return await base.VisitAsync(node, context).ConfigureAwait(false);
+        return base.VisitAsync(node, context);
     }
 
     /// <summary>
@@ -235,11 +235,11 @@ public class ValidationVisitor : QueryNodeVisitor
     /// <param name="options">The validation options.</param>
     /// <param name="context">Optional context (created if not provided).</param>
     /// <returns>The validation result.</returns>
-    public static async Task<QueryValidationResult> RunAsync(QueryNode node, QueryValidationOptions options, IQueryVisitorContext? context = null)
+    public static Task<QueryValidationResult> RunAsync(QueryNode node, QueryValidationOptions options, IQueryVisitorContext? context = null)
     {
         context ??= new QueryVisitorContext();
         context.SetValidationOptions(options);
-        return await RunAsync(node, context).ConfigureAwait(false);
+        return RunAsync(node, context);
     }
 
     /// <summary>
@@ -249,11 +249,11 @@ public class ValidationVisitor : QueryNodeVisitor
     /// <param name="allowedFields">The fields that are allowed.</param>
     /// <param name="context">Optional context (created if not provided).</param>
     /// <returns>The validation result.</returns>
-    public static async Task<QueryValidationResult> RunAsync(QueryNode node, IEnumerable<string> allowedFields, IQueryVisitorContext? context = null)
+    public static Task<QueryValidationResult> RunAsync(QueryNode node, IEnumerable<string> allowedFields, IQueryVisitorContext? context = null)
     {
         var options = new QueryValidationOptions();
         foreach (var field in allowedFields)
             options.AllowedFields.Add(field);
-        return await RunAsync(node, options, context).ConfigureAwait(false);
+        return RunAsync(node, options, context);
     }
 }

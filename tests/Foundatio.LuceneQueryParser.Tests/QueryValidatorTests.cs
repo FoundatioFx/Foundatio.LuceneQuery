@@ -8,7 +8,7 @@ public class QueryValidatorTests
     public async Task ValidateQueryAsync_ValidQuery_ReturnsIsValid()
     {
         var result = await QueryValidator.ValidateQueryAsync("title:hello");
-        
+
         Assert.True(result.IsValid);
         Assert.Empty(result.ValidationErrors);
     }
@@ -17,7 +17,7 @@ public class QueryValidatorTests
     public async Task ValidateQueryAsync_InvalidSyntax_ReturnsErrors()
     {
         var result = await QueryValidator.ValidateQueryAsync("title:");
-        
+
         Assert.False(result.IsValid);
         Assert.NotEmpty(result.ValidationErrors);
     }
@@ -254,8 +254,8 @@ public class QueryValidatorTests
         var options = new QueryValidationOptions();
         options.AllowedFields.Add("author");
 
-        await Assert.ThrowsAsync<QueryValidationException>(async () => 
-            await document.ValidateAndThrowAsync(options));
+        await Assert.ThrowsAsync<QueryValidationException>(() =>
+            document.ValidateAndThrowAsync(options));
     }
 
     [Fact]

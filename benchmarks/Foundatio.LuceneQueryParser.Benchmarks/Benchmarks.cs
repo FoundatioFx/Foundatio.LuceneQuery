@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using Foundatio.LuceneQueryParser.Ast;
-using Foundatio.LuceneQueryParser.Visitors;
+using Foundatio.Parsers.LuceneQueries.Visitors;
+using OldParser = Foundatio.Parsers.LuceneQueries;
 
 namespace Foundatio.LuceneQueryParser.Benchmarks;
 
@@ -23,6 +24,13 @@ public class Benchmarks
     private QueryStringBuilder _builder = null!;
     private QueryNodeVisitor _visitor = null!;
 
+    // Foundatio.Parsers objects for comparison
+    private OldParser.LuceneQueryParser _oldParser = null!;
+    private OldParser.Nodes.IQueryNode _oldSimpleNode = null!;
+    private OldParser.Nodes.IQueryNode _oldFieldNode = null!;
+    private OldParser.Nodes.IQueryNode _oldComplexNode = null!;
+    private GenerateQueryVisitor _oldGenerateVisitor = null!;
+
     [GlobalSetup]
     public void Setup()
     {
@@ -31,6 +39,13 @@ public class Benchmarks
         _complexDoc = LuceneQuery.Parse(ComplexQuery).Document;
         _builder = new QueryStringBuilder(256);
         _visitor = new NoOpVisitor();
+
+        // Setup Foundatio.Parsers
+        _oldParser = new OldParser.LuceneQueryParser();
+        _oldSimpleNode = _oldParser.Parse(SimpleQuery);
+        _oldFieldNode = _oldParser.Parse(FieldQuery);
+        _oldComplexNode = _oldParser.Parse(ComplexQuery);
+        _oldGenerateVisitor = new GenerateQueryVisitor();
     }
 
     #region Parsing
@@ -44,6 +59,15 @@ public class Benchmarks
     [Benchmark]
     public LuceneParseResult Parse_Complex() => LuceneQuery.Parse(ComplexQuery);
 
+    [Benchmark(Baseline = true)]
+    public OldParser.Nodes.IQueryNode Parse_Simple_Old() => _oldParser.Parse(SimpleQuery);
+
+    [Benchmark]
+    public OldParser.Nodes.IQueryNode Parse_Field_Old() => _oldParser.Parse(FieldQuery);
+
+    [Benchmark]
+    public OldParser.Nodes.IQueryNode Parse_Complex_Old() => _oldParser.Parse(ComplexQuery);
+
     #endregion
 
     #region Query String Building
@@ -53,6 +77,12 @@ public class Benchmarks
 
     [Benchmark]
     public string Build_Complex() => _builder.Visit(_complexDoc);
+
+    [Benchmark]
+    public async Task<string> Build_Simple_Old() => await _oldGenerateVisitor.AcceptAsync(_oldSimpleNode, null);
+
+    [Benchmark]
+    public async Task<string> Build_Complex_Old() => await _oldGenerateVisitor.AcceptAsync(_oldComplexNode, null);
 
     #endregion
 
@@ -72,6 +102,20 @@ public class Benchmarks
         return _builder.Visit(result.Document);
     }
 
+    [Benchmark]
+    public async Task<string> RoundTrip_Field_Old()
+    {
+        var node = _oldParser.Parse(FieldQuery);
+        return await _oldGenerateVisitor.AcceptAsync(node, null);
+    }
+
+    [Benchmark]
+    public async Task<string> RoundTrip_Complex_Old()
+    {
+        var node = _oldParser.Parse(ComplexQuery);
+        return await _oldGenerateVisitor.AcceptAsync(node, null);
+    }
+
     #endregion
 
     #region Visitor Traversal
@@ -79,7 +123,7 @@ public class Benchmarks
     [Benchmark]
     public async Task<QueryNode> Visit_Complex()
     {
-        var context = new QueryVisitorContext();
+        var context = new Foundatio.LuceneQueryParser.Visitors.QueryVisitorContext();
         return await _visitor.AcceptAsync(_complexDoc, context);
     }
 

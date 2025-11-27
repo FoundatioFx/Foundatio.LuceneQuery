@@ -31,15 +31,15 @@ public class LuceneParser
         _tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
         _position = 0;
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool SpanEquals(ReadOnlySpan<char> a, ReadOnlySpan<char> b)
         => a.SequenceEqual(b);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool SpanEqualsIgnoreCase(ReadOnlySpan<char> a, ReadOnlySpan<char> b)
         => a.Equals(b, StringComparison.OrdinalIgnoreCase);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsStar(ReadOnlySpan<char> span)
         => span.Length == 1 && span[0] == '*';
@@ -93,7 +93,7 @@ public class LuceneParser
                 return multiTerm;
             }
         }
-        
+
         return ParseOrQuery();
     }
 
@@ -145,7 +145,7 @@ public class LuceneParser
                 {
                     clauses.Add(new BooleanClause { Query = right, Occur = Occur.Should, Operator = BooleanOperator.Implicit });
                 }
-                
+
                 // If no progress was made, break to avoid infinite loop
                 if (_position == positionBeforeParse)
                 {
@@ -221,7 +221,7 @@ public class LuceneParser
                 {
                     clauses.Add(new BooleanClause { Query = right, Occur = Occur.Must, Operator = BooleanOperator.Implicit });
                 }
-                
+
                 // If no progress was made, break to avoid infinite loop
                 if (_position == positionBeforeParse)
                 {
@@ -361,7 +361,7 @@ public class LuceneParser
         SkipWhitespace();
 
         QueryNode? innerQuery;
-        
+
         if (!SplitOnWhitespace)
         {
             // Try to parse as MultiTerm first (consecutive simple terms without operators)
@@ -482,17 +482,17 @@ public class LuceneParser
             StartColumn = startToken.Column
         };
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ReadOnlyMemory<char> BuildCombinedText(List<ReadOnlyMemory<char>> terms)
     {
         if (terms.Count == 1)
             return terms[0];
-            
+
         int totalLength = terms.Count - 1; // spaces
         foreach (var term in terms)
             totalLength += term.Length;
-            
+
         var chars = new char[totalLength];
         int pos = 0;
         for (int i = 0; i < terms.Count; i++)
@@ -919,7 +919,7 @@ public class LuceneParser
             StartLine = startToken.Line,
             StartColumn = startToken.Column
         };
-        
+
         // Set min/max, treating * as unbounded
         if (min.HasValue && !IsStar(min.Value.Span))
             node.MinMemory = min.Value;
@@ -958,7 +958,7 @@ public class LuceneParser
     }
 
     /// <summary>
-    /// Parses a short-form range query (>, >=, <, <=).
+    /// Parses a short-form range query (&gt;, &gt;=, &lt;, &lt;=).
     /// </summary>
     private RangeNode ParseShortRange()
     {
@@ -1077,7 +1077,7 @@ public class LuceneParser
     private static ReadOnlyMemory<char> UnescapeTerm(ReadOnlyMemory<char> term)
     {
         var span = term.Span;
-        
+
         // Fast path: no backslash means no escaping needed
         if (span.IndexOf('\\') < 0)
             return term;

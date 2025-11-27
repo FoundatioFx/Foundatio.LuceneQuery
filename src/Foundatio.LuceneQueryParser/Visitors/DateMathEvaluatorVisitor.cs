@@ -119,9 +119,9 @@ public class DateMathEvaluatorVisitor : QueryNodeVisitor
     {
         result = expression;
 
-        // Quick check: DateMath expressions either start with "now", contain "||", 
+        // Quick check: DateMath expressions either start with "now", contain "||",
         // or look like a date with operations (e.g., 2024-01-01+1M/d)
-        if (!expression.StartsWith("now", StringComparison.OrdinalIgnoreCase) && 
+        if (!expression.StartsWith("now", StringComparison.OrdinalIgnoreCase) &&
             !expression.Contains("||") &&
             !LooksLikeDateMathWithOperations(expression))
         {
@@ -155,10 +155,10 @@ public class DateMathEvaluatorVisitor : QueryNodeVisitor
     /// <param name="query">The query to process</param>
     /// <param name="context">The visitor context</param>
     /// <returns>The processed query with DateMath expressions evaluated</returns>
-    public async Task<QueryNode> EvaluateAsync(QueryNode query, IQueryVisitorContext? context = null)
+    public Task<QueryNode> EvaluateAsync(QueryNode query, IQueryVisitorContext? context = null)
     {
         context ??= new QueryVisitorContext();
-        return await AcceptAsync(query, context).ConfigureAwait(false);
+        return AcceptAsync(query, context);
     }
 
     /// <summary>
@@ -166,6 +166,7 @@ public class DateMathEvaluatorVisitor : QueryNodeVisitor
     /// </summary>
     /// <param name="query">The query to process</param>
     /// <param name="context">The visitor context</param>
+    /// <param name="relativeBaseTime">The base time to use for relative date calculations</param>
     /// <returns>The processed query with DateMath expressions evaluated</returns>
     public static Task<QueryNode> EvaluateAsync(QueryNode query, IQueryVisitorContext? context, DateTimeOffset relativeBaseTime)
     {
@@ -207,7 +208,7 @@ public class DateMathEvaluatorVisitor : QueryNodeVisitor
                 int j = i + 1;
                 while (j < expression.Length && char.IsDigit(expression[j]))
                     j++;
-                
+
                 if (j < expression.Length)
                 {
                     char unit = expression[j];

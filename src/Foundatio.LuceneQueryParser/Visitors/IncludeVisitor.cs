@@ -161,11 +161,11 @@ public class IncludeVisitor : QueryNodeVisitor
     /// <param name="resolver">The include resolver to use.</param>
     /// <param name="context">Optional context. If null, a new context is created.</param>
     /// <returns>The processed query document with includes expanded.</returns>
-    public static async Task<QueryDocument> ExpandIncludesAsync(QueryDocument document, IncludeResolver resolver, IQueryVisitorContext? context = null)
+    public static Task<QueryDocument> ExpandIncludesAsync(QueryDocument document, IncludeResolver resolver, IQueryVisitorContext? context = null)
     {
         context ??= new QueryVisitorContext();
         context.SetIncludeResolver(resolver);
-        return await new IncludeVisitor().RunAsync(document, context).ConfigureAwait(false);
+        return new IncludeVisitor().RunAsync(document, context);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public class IncludeVisitor : QueryNodeVisitor
     /// <param name="includes">Dictionary mapping include names to their query content.</param>
     /// <param name="context">Optional context. If null, a new context is created.</param>
     /// <returns>The processed query document with includes expanded.</returns>
-    public static async Task<QueryDocument> ExpandIncludesAsync(QueryDocument document, IDictionary<string, string> includes, IQueryVisitorContext? context = null)
+    public static Task<QueryDocument> ExpandIncludesAsync(QueryDocument document, IDictionary<string, string> includes, IQueryVisitorContext? context = null)
     {
         IncludeResolver resolver = name =>
         {
@@ -183,7 +183,7 @@ public class IncludeVisitor : QueryNodeVisitor
             return Task.FromResult(value);
         };
 
-        return await ExpandIncludesAsync(document, resolver, context).ConfigureAwait(false);
+        return ExpandIncludesAsync(document, resolver, context);
     }
 
     #endregion
@@ -201,9 +201,9 @@ public static class IncludeExtensions
     /// <param name="resolver">The include resolver to use.</param>
     /// <param name="context">Optional context. If null, a new context is created.</param>
     /// <returns>The processed query document with includes expanded.</returns>
-    public static async Task<QueryDocument> ExpandIncludesAsync(this QueryDocument document, IncludeResolver resolver, IQueryVisitorContext? context = null)
+    public static Task<QueryDocument> ExpandIncludesAsync(this QueryDocument document, IncludeResolver resolver, IQueryVisitorContext? context = null)
     {
-        return await IncludeVisitor.ExpandIncludesAsync(document, resolver, context).ConfigureAwait(false);
+        return IncludeVisitor.ExpandIncludesAsync(document, resolver, context);
     }
 
     /// <summary>
@@ -213,9 +213,9 @@ public static class IncludeExtensions
     /// <param name="includes">Dictionary mapping include names to their query content.</param>
     /// <param name="context">Optional context. If null, a new context is created.</param>
     /// <returns>The processed query document with includes expanded.</returns>
-    public static async Task<QueryDocument> ExpandIncludesAsync(this QueryDocument document, IDictionary<string, string> includes, IQueryVisitorContext? context = null)
+    public static Task<QueryDocument> ExpandIncludesAsync(this QueryDocument document, IDictionary<string, string> includes, IQueryVisitorContext? context = null)
     {
-        return await IncludeVisitor.ExpandIncludesAsync(document, includes, context).ConfigureAwait(false);
+        return IncludeVisitor.ExpandIncludesAsync(document, includes, context);
     }
 
     /// <summary>
@@ -224,8 +224,8 @@ public static class IncludeExtensions
     /// <param name="document">The query document to process.</param>
     /// <param name="context">The context containing the include resolver.</param>
     /// <returns>The processed query document with includes expanded.</returns>
-    public static async Task<QueryDocument> ExpandIncludesAsync(this QueryDocument document, IQueryVisitorContext context)
+    public static Task<QueryDocument> ExpandIncludesAsync(this QueryDocument document, IQueryVisitorContext context)
     {
-        return await new IncludeVisitor().RunAsync(document, context).ConfigureAwait(false);
+        return new IncludeVisitor().RunAsync(document, context);
     }
 }

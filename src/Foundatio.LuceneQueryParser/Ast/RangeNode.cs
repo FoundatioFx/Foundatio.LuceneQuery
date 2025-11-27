@@ -8,7 +8,7 @@ public class RangeNode : QueryNode
     private ReadOnlyMemory<char> _field;
     private ReadOnlyMemory<char> _min;
     private ReadOnlyMemory<char> _max;
-    
+
     /// <summary>
     /// The field name as a memory slice (zero allocation).
     /// </summary>
@@ -17,7 +17,7 @@ public class RangeNode : QueryNode
         get => _field;
         set => _field = value;
     }
-    
+
     /// <summary>
     /// The field name (optional, may be set at FieldQueryNode level).
     /// Use FieldMemory for zero-allocation access.
@@ -36,7 +36,7 @@ public class RangeNode : QueryNode
         get => _min;
         set => _min = value;
     }
-    
+
     /// <summary>
     /// The lower bound of the range (null for unbounded).
     /// Use MinMemory for zero-allocation access.
@@ -55,7 +55,7 @@ public class RangeNode : QueryNode
         get => _max;
         set => _max = value;
     }
-    
+
     /// <summary>
     /// The upper bound of the range (null for unbounded).
     /// Use MaxMemory for zero-allocation access.
@@ -82,7 +82,7 @@ public class RangeNode : QueryNode
     public float? Boost { get; set; }
 
     /// <summary>
-    /// The operator used for short-form ranges (>, >=, <, <=).
+    /// The operator used for short-form ranges (&gt;, &gt;=, &lt;, &lt;=).
     /// </summary>
     public RangeOperator? Operator { get; set; }
 }

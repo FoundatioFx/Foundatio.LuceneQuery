@@ -14,13 +14,13 @@ public static class QueryValidator
     /// <param name="query">The query string to validate.</param>
     /// <param name="options">Optional validation options.</param>
     /// <returns>The validation result.</returns>
-    public static async Task<QueryValidationResult> ValidateQueryAsync(string query, QueryValidationOptions? options = null)
+    public static Task<QueryValidationResult> ValidateQueryAsync(string query, QueryValidationOptions? options = null)
     {
         var context = new QueryVisitorContext();
         if (options is not null)
             context.SetValidationOptions(options);
 
-        return await InternalValidateAsync(query, context).ConfigureAwait(false);
+        return InternalValidateAsync(query, context);
     }
 
     /// <summary>
@@ -30,11 +30,11 @@ public static class QueryValidator
     /// <param name="options">Optional validation options.</param>
     /// <returns>The validation result.</returns>
     /// <exception cref="QueryValidationException">Thrown when the query is invalid.</exception>
-    public static async Task<QueryValidationResult> ValidateQueryAndThrowAsync(string query, QueryValidationOptions? options = null)
+    public static Task<QueryValidationResult> ValidateQueryAndThrowAsync(string query, QueryValidationOptions? options = null)
     {
         options ??= new QueryValidationOptions();
         options.ShouldThrow = true;
-        return await ValidateQueryAsync(query, options).ConfigureAwait(false);
+        return ValidateQueryAsync(query, options);
     }
 
     /// <summary>
@@ -43,12 +43,12 @@ public static class QueryValidator
     /// <param name="query">The query string to validate.</param>
     /// <param name="allowedFields">The fields that are allowed in the query.</param>
     /// <returns>The validation result.</returns>
-    public static async Task<QueryValidationResult> ValidateQueryAsync(string query, IEnumerable<string> allowedFields)
+    public static Task<QueryValidationResult> ValidateQueryAsync(string query, IEnumerable<string> allowedFields)
     {
         var options = new QueryValidationOptions();
         foreach (var field in allowedFields)
             options.AllowedFields.Add(field);
-        return await ValidateQueryAsync(query, options).ConfigureAwait(false);
+        return ValidateQueryAsync(query, options);
     }
 
     /// <summary>
@@ -57,9 +57,9 @@ public static class QueryValidator
     /// <param name="document">The parsed query document.</param>
     /// <param name="options">Optional validation options.</param>
     /// <returns>The validation result.</returns>
-    public static async Task<QueryValidationResult> ValidateAsync(QueryDocument document, QueryValidationOptions? options = null)
+    public static Task<QueryValidationResult> ValidateAsync(QueryDocument document, QueryValidationOptions? options = null)
     {
-        return await ValidationVisitor.RunAsync(document, options ?? new QueryValidationOptions()).ConfigureAwait(false);
+        return ValidationVisitor.RunAsync(document, options ?? new QueryValidationOptions());
     }
 
     /// <summary>
@@ -68,9 +68,9 @@ public static class QueryValidator
     /// <param name="node">The query node to validate.</param>
     /// <param name="options">Optional validation options.</param>
     /// <returns>The validation result.</returns>
-    public static async Task<QueryValidationResult> ValidateAsync(QueryNode node, QueryValidationOptions? options = null)
+    public static Task<QueryValidationResult> ValidateAsync(QueryNode node, QueryValidationOptions? options = null)
     {
-        return await ValidationVisitor.RunAsync(node, options ?? new QueryValidationOptions()).ConfigureAwait(false);
+        return ValidationVisitor.RunAsync(node, options ?? new QueryValidationOptions());
     }
 
     private static async Task<QueryValidationResult> InternalValidateAsync(string query, IQueryVisitorContext context)
@@ -100,13 +100,13 @@ public static class QueryValidator
         catch (Exception ex)
         {
             context.AddValidationError(ex.Message);
-            
+
             var options = context.GetValidationOptions();
             if (options.ShouldThrow)
             {
                 throw new QueryValidationException(ex.Message, context.GetValidationResult(), ex);
             }
-            
+
             return context.GetValidationResult();
         }
     }
@@ -123,9 +123,9 @@ public static class QueryValidationExtensions
     /// <param name="document">The document to validate.</param>
     /// <param name="options">Optional validation options.</param>
     /// <returns>The validation result.</returns>
-    public static async Task<QueryValidationResult> ValidateAsync(this QueryDocument document, QueryValidationOptions? options = null)
+    public static Task<QueryValidationResult> ValidateAsync(this QueryDocument document, QueryValidationOptions? options = null)
     {
-        return await QueryValidator.ValidateAsync(document, options).ConfigureAwait(false);
+        return QueryValidator.ValidateAsync(document, options);
     }
 
     /// <summary>
@@ -134,12 +134,12 @@ public static class QueryValidationExtensions
     /// <param name="document">The document to validate.</param>
     /// <param name="allowedFields">The fields that are allowed.</param>
     /// <returns>The validation result.</returns>
-    public static async Task<QueryValidationResult> ValidateAsync(this QueryDocument document, IEnumerable<string> allowedFields)
+    public static Task<QueryValidationResult> ValidateAsync(this QueryDocument document, IEnumerable<string> allowedFields)
     {
         var options = new QueryValidationOptions();
         foreach (var field in allowedFields)
             options.AllowedFields.Add(field);
-        return await document.ValidateAsync(options).ConfigureAwait(false);
+        return document.ValidateAsync(options);
     }
 
     /// <summary>
@@ -149,11 +149,11 @@ public static class QueryValidationExtensions
     /// <param name="options">Optional validation options.</param>
     /// <returns>The validation result.</returns>
     /// <exception cref="QueryValidationException">Thrown when validation fails.</exception>
-    public static async Task<QueryValidationResult> ValidateAndThrowAsync(this QueryDocument document, QueryValidationOptions? options = null)
+    public static Task<QueryValidationResult> ValidateAndThrowAsync(this QueryDocument document, QueryValidationOptions? options = null)
     {
         options ??= new QueryValidationOptions();
         options.ShouldThrow = true;
-        return await document.ValidateAsync(options).ConfigureAwait(false);
+        return document.ValidateAsync(options);
     }
 
     /// <summary>
@@ -165,7 +165,7 @@ public static class QueryValidationExtensions
     public static async Task<QueryValidationResult> ValidateAsync(this LuceneParseResult result, QueryValidationOptions? options = null)
     {
         var context = new QueryVisitorContext();
-        
+
         if (options is not null)
             context.SetValidationOptions(options);
 

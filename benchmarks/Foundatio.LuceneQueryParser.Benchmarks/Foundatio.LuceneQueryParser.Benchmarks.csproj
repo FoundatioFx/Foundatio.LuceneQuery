@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageReference Include="Foundatio.Parsers.LuceneQueries" Version="7.*" />
   </ItemGroup>
 
   <ItemGroup>

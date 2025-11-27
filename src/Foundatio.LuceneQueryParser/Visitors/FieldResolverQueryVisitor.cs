@@ -228,11 +228,11 @@ public class FieldResolverQueryVisitor : QueryNodeVisitor
     /// <param name="resolver">The field resolver to use.</param>
     /// <param name="context">Optional context. If null, a new context is created.</param>
     /// <returns>The processed query document.</returns>
-    public static async Task<QueryDocument> RunAsync(QueryDocument document, QueryFieldResolver resolver, IQueryVisitorContext? context = null)
+    public static Task<QueryDocument> RunAsync(QueryDocument document, QueryFieldResolver resolver, IQueryVisitorContext? context = null)
     {
         context ??= new QueryVisitorContext();
         context.SetFieldResolver(resolver);
-        return await new FieldResolverQueryVisitor().RunAsync(document, context).ConfigureAwait(false);
+        return new FieldResolverQueryVisitor().RunAsync(document, context);
     }
 
     /// <summary>
@@ -242,11 +242,11 @@ public class FieldResolverQueryVisitor : QueryNodeVisitor
     /// <param name="resolver">The synchronous field resolver to use.</param>
     /// <param name="context">Optional context. If null, a new context is created.</param>
     /// <returns>The processed query document.</returns>
-    public static async Task<QueryDocument> RunAsync(QueryDocument document, Func<string, string?> resolver, IQueryVisitorContext? context = null)
+    public static Task<QueryDocument> RunAsync(QueryDocument document, Func<string, string?> resolver, IQueryVisitorContext? context = null)
     {
         context ??= new QueryVisitorContext();
         context.SetFieldResolver(resolver);
-        return await new FieldResolverQueryVisitor().RunAsync(document, context).ConfigureAwait(false);
+        return new FieldResolverQueryVisitor().RunAsync(document, context);
     }
 
     /// <summary>
@@ -257,11 +257,11 @@ public class FieldResolverQueryVisitor : QueryNodeVisitor
     /// <param name="map">The field map to use for resolution.</param>
     /// <param name="context">Optional context. If null, a new context is created.</param>
     /// <returns>The processed query document.</returns>
-    public static async Task<QueryDocument> RunAsync(QueryDocument document, IDictionary<string, string> map, IQueryVisitorContext? context = null)
+    public static Task<QueryDocument> RunAsync(QueryDocument document, IDictionary<string, string> map, IQueryVisitorContext? context = null)
     {
         context ??= new QueryVisitorContext();
         context.SetFieldResolver(map.ToHierarchicalFieldResolver());
-        return await new FieldResolverQueryVisitor().RunAsync(document, context).ConfigureAwait(false);
+        return new FieldResolverQueryVisitor().RunAsync(document, context);
     }
 
     #endregion
