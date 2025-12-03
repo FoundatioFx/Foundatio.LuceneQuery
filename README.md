@@ -1,6 +1,6 @@
 # Foundatio.LuceneQuery
 
-A library for adding dynamic Lucene-style query capabilities to your .NET applications. Enable your users to write powerful search queries using familiar Lucene syntax, with support for Entity Framework Core and (coming soon) Elasticsearch.
+A library for adding dynamic Lucene-style query capabilities to your .NET applications. Enable your users to write powerful search queries using familiar Lucene syntax, with support for Entity Framework Core and Elasticsearch.
 
 This project is a modern replacement for [Foundatio.Parsers](https://github.com/FoundatioFx/Foundatio.Parsers).
 
@@ -8,7 +8,7 @@ This project is a modern replacement for [Foundatio.Parsers](https://github.com/
 
 - **Dynamic User Queries** - Let users write powerful search queries using Lucene syntax
 - **Entity Framework Integration** - Convert Lucene queries directly to LINQ expressions for EF Core
-- **Elasticsearch Support** - (Coming soon) Generate Elasticsearch queries from the same syntax
+- **Elasticsearch Support** - Generate Elasticsearch Query DSL from Lucene syntax using the official .NET client
 - **Full Lucene Query Syntax** - Terms, phrases, fields, ranges, boolean operators, wildcards, regex, and more
 - **Date Math Expressions** - Support for Elasticsearch-style date math (`now-1d`, `2024-01-01||+1M/d`)
 - **Visitor Pattern** - Transform, validate, or analyze queries with composable visitors
@@ -25,6 +25,9 @@ dotnet add package Foundatio.LuceneQuery
 
 # Entity Framework integration (optional)
 dotnet add package Foundatio.LuceneQuery.EntityFramework
+
+# Elasticsearch integration (optional)
+dotnet add package Foundatio.LuceneQuery.Elasticsearch
 ```
 
 ## Quick Start
@@ -137,6 +140,68 @@ var fieldMap = new FieldMap
 
 // User query: "name:john AND dept:engineering AND hired:[2020-01-01 TO *]"
 Expression<Func<Employee, bool>> filter = parser.BuildFilter<Employee>(userQuery, fieldMap);
+```
+
+### Elasticsearch Integration
+
+Generate Elasticsearch Query DSL from Lucene syntax:
+
+```csharp
+using Foundatio.LuceneQuery.Elasticsearch;
+using Elastic.Clients.Elasticsearch;
+
+var parser = new ElasticsearchQueryParser();
+
+// Build an Elasticsearch Query from a Lucene query string
+var query = parser.BuildQuery("title:hello AND status:active");
+
+// Use with the Elasticsearch client
+var client = new ElasticsearchClient();
+var response = await client.SearchAsync<Document>(s => s
+    .Index("my-index")
+    .Query(query)
+);
+```
+
+With configuration options:
+
+```csharp
+var parser = new ElasticsearchQueryParser(config =>
+{
+    // Use scoring queries (match) instead of filter queries (term)
+    config.UseScoring = true;
+
+    // Set default fields for unfielded terms
+    config.DefaultFields = ["title", "content"];
+
+    // Map user-friendly field names
+    config.FieldMap = new FieldMap
+    {
+        { "author", "metadata.author" },
+        { "created", "metadata.timestamp" }
+    };
+
+    // Configure geo field detection for geo queries
+    config.IsGeoPointField = field => field == "location";
+
+    // Configure date field detection for date ranges
+    config.IsDateField = field => field.EndsWith("date") || field.EndsWith("timestamp");
+    config.DefaultTimeZone = "America/Chicago";
+});
+
+var query = parser.BuildQuery("author:john AND created:[2024-01-01 TO now]");
+```
+
+#### Geo Queries
+
+The Elasticsearch integration supports geo queries:
+
+```csharp
+// Distance query
+parser.BuildQuery("location:40.7128,-74.0060~10km");
+
+// Bounding box (min_lon,min_lat TO max_lon,max_lat)
+parser.BuildQuery("location:[-74.1,40.6 TO -73.9,40.8]");
 ```
 
 ## Use Cases

@@ -4,7 +4,7 @@
 
 This library provides dynamic Lucene-style query capabilities for .NET applications, allowing users to write powerful search queries using familiar Lucene syntax. It serves as a modern replacement for [Foundatio.Parsers](https://github.com/FoundatioFx/Foundatio.Parsers).
 
-The core pipeline converts query strings into an AST (Abstract Syntax Tree), with support for query transformation via visitors. Currently supports Entity Framework Core for LINQ expression generation, with Elasticsearch support planned.
+The core pipeline converts query strings into an AST (Abstract Syntax Tree), with support for query transformation via visitors. Supports Entity Framework Core for LINQ expression generation and Elasticsearch for Query DSL generation.
 
 ### Core Pipeline
 ```
@@ -50,6 +50,7 @@ dotnet run -c Release --project benchmarks/Foundatio.LuceneQuery.Benchmarks  # R
 ### Project Structure
 - `src/Foundatio.LuceneQuery/` - Core parser library (net8.0, net10.0)
 - `src/Foundatio.LuceneQuery.EntityFramework/` - EF Core integration for LINQ expression generation
+- `src/Foundatio.LuceneQuery.Elasticsearch/` - Elasticsearch integration for Query DSL generation (uses Elastic.Clients.Elasticsearch 9.x)
 - `tests/` - xUnit test projects
 
 ## Patterns & Conventions
@@ -88,6 +89,21 @@ var results = context.Employees.Where(filter);
 - `ExpressionBuilderVisitor` converts AST to LINQ expressions
 - Entity field metadata auto-discovered via EF Core `IEntityType`
 
+### Elasticsearch Integration
+```csharp
+var parser = new ElasticsearchQueryParser(config =>
+{
+    config.UseScoring = true;
+    config.DefaultFields = ["title", "content"];
+    config.FieldMap = new FieldMap { { "author", "metadata.author" } };
+});
+var query = parser.BuildQuery("author:john AND status:active");
+// Returns Elastic.Clients.Elasticsearch.QueryDsl.Query
+```
+- `ElasticsearchQueryBuilderVisitor` converts AST to Elasticsearch Query DSL
+- Supports geo queries (distance, bounding box), date ranges, wildcards, regex
+- Uses Elastic.Clients.Elasticsearch 9.x (official .NET client)
+
 ## Test Patterns
 
 Tests follow xUnit conventions with descriptive method names:
@@ -103,6 +119,8 @@ Key test files for understanding behavior:
 - `ParserTests.cs` - Comprehensive parsing scenarios (~1100 lines)
 - `ChainableVisitorTests.cs` - Visitor composition patterns
 - `EntityFrameworkQueryParserTests.cs` - EF integration with in-memory database
+- `ElasticsearchQueryParserTests.cs` - Elasticsearch integration unit tests
+- `ElasticsearchIntegrationTests.cs` - Integration tests with Elasticsearch using Testcontainers
 
 ## Supported Query Syntax
 
