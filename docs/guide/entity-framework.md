@@ -17,9 +17,7 @@ using Microsoft.EntityFrameworkCore;
 var parser = new EntityFrameworkQueryParser();
 
 // Build a LINQ expression from a Lucene query
-Expression<Func<Employee, bool>> filter = parser.BuildFilter<Employee>(
-    "name:john AND department:engineering"
-);
+var filter = parser.BuildFilter<Employee>("name:john AND department:engineering");
 
 // Use with EF Core
 var results = await context.Employees
@@ -38,7 +36,7 @@ public async Task<IActionResult> SearchEmployees([FromQuery] string query)
     var parser = new EntityFrameworkQueryParser();
 
     // User provides: "name:john AND salary:[50000 TO *]"
-    Expression<Func<Employee, bool>> filter = parser.BuildFilter<Employee>(query);
+    var filter = parser.BuildFilter<Employee>(query);
 
     var results = await _context.Employees
         .Where(filter)
@@ -64,7 +62,7 @@ var fieldMap = new FieldMap
 };
 
 // User query: "name:john AND dept:engineering"
-Expression<Func<Employee, bool>> filter = parser.BuildFilter<Employee>(query, fieldMap);
+var filter = parser.BuildFilter<Employee>(query, fieldMap);
 ```
 
 ## Supported Query Types

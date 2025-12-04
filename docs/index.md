@@ -63,9 +63,7 @@ if (result.IsSuccess)
 using Foundatio.LuceneQuery.EntityFramework;
 
 var parser = new EntityFrameworkQueryParser();
-Expression<Func<Employee, bool>> filter = parser.BuildFilter<Employee>(
-    "name:john AND salary:[50000 TO *]"
-);
+var filter = parser.BuildFilter<Employee>("name:john AND salary:[50000 TO *]");
 var results = await context.Employees.Where(filter).ToListAsync();
 ```
 

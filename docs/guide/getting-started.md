@@ -118,7 +118,7 @@ public async Task<IActionResult> SearchEmployees([FromQuery] string query)
     var parser = new EntityFrameworkQueryParser();
 
     // User provides: "name:john AND salary:[50000 TO *] AND department:engineering"
-    Expression<Func<Employee, bool>> filter = parser.BuildFilter<Employee>(query);
+    var filter = parser.BuildFilter<Employee>(query);
 
     var results = await _context.Employees
         .Where(filter)
@@ -142,7 +142,7 @@ var fieldMap = new FieldMap
 };
 
 // User query: "name:john AND dept:engineering AND hired:[2020-01-01 TO *]"
-Expression<Func<Employee, bool>> filter = parser.BuildFilter<Employee>(userQuery, fieldMap);
+var filter = parser.BuildFilter<Employee>(userQuery, fieldMap);
 ```
 
 ## Elasticsearch Integration

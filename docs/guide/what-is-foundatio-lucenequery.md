@@ -2,8 +2,6 @@
 
 Foundatio.LuceneQuery is a library for adding dynamic Lucene-style query capabilities to your .NET applications. It enables your users to write powerful search queries using familiar Lucene syntax, with built-in support for Entity Framework Core and Elasticsearch.
 
-This project is a modern replacement for [Foundatio.Parsers](https://github.com/FoundatioFx/Foundatio.Parsers).
-
 ## Why Lucene Query Syntax?
 
 Lucene query syntax is a widely-adopted standard for search queries. Users familiar with tools like Elasticsearch, Kibana, or Apache Solr will feel right at home. The syntax is powerful yet intuitive:
@@ -53,9 +51,7 @@ Convert Lucene queries directly to LINQ expressions for EF Core:
 
 ```csharp
 var parser = new EntityFrameworkQueryParser();
-Expression<Func<Employee, bool>> filter = parser.BuildFilter<Employee>(
-    "name:john AND salary:[50000 TO *]"
-);
+var filter = parser.BuildFilter<Employee>("name:john AND salary:[50000 TO *]");
 var results = await context.Employees.Where(filter).ToListAsync();
 ```
 
