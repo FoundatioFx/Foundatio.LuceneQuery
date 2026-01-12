@@ -24,8 +24,7 @@ public class ElasticsearchFixture : IAsyncLifetime
         // Use Elasticsearch 9.x which is required for the Elastic.Clients.Elasticsearch 9.x client
         // The 9.x client sends version 9 headers that ES 8.x rejects
         // Use generic container builder for ES 9.x since Testcontainers.Elasticsearch doesn't support it yet
-        _container = new ContainerBuilder()
-            .WithImage("docker.elastic.co/elasticsearch/elasticsearch:9.0.0")
+        _container = new ContainerBuilder("docker.elastic.co/elasticsearch/elasticsearch:9.0.0")
             .WithPortBinding(ElasticsearchPort, true)
             .WithEnvironment("discovery.type", "single-node")
             .WithEnvironment("ELASTIC_PASSWORD", Password)

@@ -93,14 +93,14 @@ public class QueryStringBuilderTests
     }
 
     [Fact]
-    public void ToQueryString_FuzzyTerm_ReturnsTilde()
+    public void ToQueryString_FuzzyTermWithExplicitDefaultValue_ReturnsExplicitValue()
     {
         var result = LuceneQuery.Parse("roam~2");
         var builder = new QueryStringBuilder();
 
         var output = builder.Visit(result.Document);
 
-        Assert.Equal("roam~", output);
+        Assert.Equal("roam~2", output);
     }
 
     [Fact]

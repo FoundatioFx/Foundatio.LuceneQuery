@@ -134,8 +134,7 @@ public class ElasticsearchQueryParserTests
 
         Assert.NotNull(query);
         Assert.NotNull(query.QueryString);
-        // Default fuzzy distance is 2
-        Assert.Equal("test~2", query.QueryString.Query);
+        Assert.Equal("test~", query.QueryString.Query);
     }
 
     [Fact]
