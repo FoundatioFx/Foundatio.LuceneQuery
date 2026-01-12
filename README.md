@@ -1,6 +1,6 @@
 [![Build status](https://github.com/FoundatioFx/Foundatio.Lucene/actions/workflows/build.yml/badge.svg)](https://github.com/FoundatioFx/Foundatio.Lucene/actions)
 [![NuGet Version](https://img.shields.io/nuget/v/Foundatio.Lucene.svg?style=flat)](https://www.nuget.org/packages/Foundatio.Lucene/)
-[![feedz.io](https://img.shields.io/badge/endpoint.svg?url=https%3A%2F%2Ff.feedz.io%2Ffoundatio%2Ffoundatio%2Fshield%2FFoundatio.Lucene%2Flatest)](https://f.feedz.io/foundatio/foundatio/packages/Foundatio.Lucene/latest/download)
+[![feedz.io](https://img.shields.io/endpoint?url=https%3A%2F%2Ff.feedz.io%2Ffoundatio%2Ffoundatio%2Fshield%2FFoundatio.Lucene%2Flatest)](https://f.feedz.io/foundatio/foundatio/packages/Foundatio.Lucene/latest/download)
 [![Discord](https://img.shields.io/discord/715744504891703319?logo=discord)](https://discord.gg/6HxgFCx)
 
 # Foundatio Lucene
